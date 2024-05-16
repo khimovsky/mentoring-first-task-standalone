@@ -8,7 +8,7 @@ import { UserCardComponent } from '../user-card/user-card.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { CreateEditUserComponent } from '../../shared/components/create-edit-user/create-edit-user.component';
 import { LocalStorageService } from '../../shared/services/local-storage.service';
-import {MatButton} from "@angular/material/button";
+import { MatButton } from "@angular/material/button";
 
 
 @Component({
@@ -47,19 +47,13 @@ export class UsersListComponent implements OnInit {
 
   public openDialog(user?: IUser): void {
     this.dialogRef = this.dialog.open(CreateEditUserComponent, { data: user });
-
-    this.dialogRef.afterOpened().subscribe(() => {
-      if (user) {
-        this.dialogRef.componentInstance.isEdit = true;
-        this.dialogRef.componentInstance.formnameControl.patchValue(user);
-      } else this.dialogRef.componentInstance.isEdit = false;
-    });
-
     this.dialogRef.afterClosed().subscribe(() => {
-      if (this.dialogRef.componentInstance.isEdit && user && this.dialogRef.componentInstance.formnameControl.valid) {
-        this.editUser(user);
-      } else if (this.dialogRef.componentInstance.formnameControl.valid) {
-        this.addUser(this.dialogRef.componentInstance.formnameControl.value);
+      const editedUser = this.dialogRef.componentInstance.formControlBuilder.value;
+      const editedUserValid = this.dialogRef.componentInstance.formControlBuilder.valid;
+      if (user && editedUserValid) {
+        this.editUser({ ...user, ...editedUser });
+      } else if (editedUserValid) {
+        this.addUser(editedUser);
       }
     });
   }
@@ -74,9 +68,8 @@ export class UsersListComponent implements OnInit {
     this.userService.users = newUsers;
   }
 
-   private editUser(user: IUser): void {
-    const newUser: IUser = {...user, ...this.dialogRef.componentInstance.formnameControl.value};
-    const newUsers: IUser[] = this.userService.users.map((user: IUser) => user.id !== newUser.id ? user : newUser);
+   private editUser(editedUser: IUser): void {
+    const newUsers: IUser[] = this.userService.users.map((user: IUser) => user.id !== editedUser.id ? user : editedUser);
     this.userService.users = newUsers;
   }
 }
