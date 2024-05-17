@@ -57,7 +57,7 @@ export class CreateEditUserComponent implements OnInit {
 
   public createEditUser(): void {
     this.formControlBuilder.valid
-      ? this.dialogRef.close()
+      ? this.dialogRef.close(false)
       : alert('Введите корректные данные!');
   }
 }

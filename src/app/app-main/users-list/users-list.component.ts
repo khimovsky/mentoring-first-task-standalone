@@ -47,12 +47,12 @@ export class UsersListComponent implements OnInit {
 
   public openDialog(user?: IUser): void {
     this.dialogRef = this.dialog.open(CreateEditUserComponent, { data: user });
-    this.dialogRef.afterClosed().subscribe(() => {
+    this.dialogRef.afterClosed().subscribe((isClosed: boolean = true) => {
       const editedUser = this.dialogRef.componentInstance.formControlBuilder.value;
       const editedUserValid = this.dialogRef.componentInstance.formControlBuilder.valid;
-      if (user && editedUserValid) {
+      if (user && editedUserValid && !isClosed) {
         this.editUser({ ...user, ...editedUser });
-      } else if (editedUserValid) {
+      } else if (editedUserValid && !isClosed) {
         this.addUser(editedUser);
       }
     });
